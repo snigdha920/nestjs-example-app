@@ -1,16 +1,25 @@
-version: "3.4"
+version: '3.4'
 
 services:
-  mysql:
-    container_name: mysql
-    image: mysql:8.3
-    restart: unless-stopped
+  mongo:
+    image: mongo:7.0
+    expose:
+      - 27017
     ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      - '27017:27017'
+    restart: always
+
+  postgre:
+    image: postgres:16.3
+    ports:
+      - '5432:5432'
     volumes:
-      - mysql:/var/lib/mysql
+      - postgre:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
 
 volumes:
-  mysql:
+  postgre:
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
