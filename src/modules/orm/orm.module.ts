@@ -6,9 +6,10 @@ import {
   type IDatabaseDriver,
 } from '@mikro-orm/core';
 import { Author, BaseEntity, Book, BookTag, Publisher } from '../../entities';
-// import { MongoDriver } from '@mikro-orm/mongodb';
+import { MongoDriver } from '@mikro-orm/mongodb';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import path from 'node:path';
+import { SqlHighlighter } from '@mikro-orm/sql-highlighter';
+import path from 'path';
 
 @Module({
   imports: [
@@ -24,7 +25,10 @@ import path from 'node:path';
           MikroOrmModuleOptions<IDatabaseDriver<Connection>>,
           'contextName'
         > = {
-          driver: PostgreSqlDriver,
+          driver:
+            databaseConfig.type === 'postgresql'
+              ? PostgreSqlDriver
+              : MongoDriver,
           implicitTransactions: false,
           validate: true,
           strict: true,
@@ -34,12 +38,6 @@ import path from 'node:path';
           entities: [Author, Book, BookTag, Publisher, BaseEntity],
           registerRequestContext: false,
           dbName: databaseConfig.dbName,
-        };
-
-        return {
-          ...baseMikroConfig,
-          host: databaseConfig.host,
-          port: databaseConfig.port,
           migrations: {
             tableName: 'mikro_orm_migrations', // name of database table with log of executed transactions
             path: path.join(__dirname, './migrations'), // path to the folder with migrations
@@ -54,6 +52,13 @@ import path from 'node:path';
             snapshot: true, // save snapshot when creating new migrations
             emit: 'js', // migration generation mode
           },
+        };
+
+        return {
+          ...baseMikroConfig,
+          highlighter: new SqlHighlighter(),
+          host: databaseConfig.host,
+          port: databaseConfig.port,
         };
       },
     }),

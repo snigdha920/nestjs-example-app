@@ -1,11 +1,17 @@
-import { Cascade, Collection, Entity, OneToMany, Property, ManyToOne, Opt } from '@mikro-orm/core';
-
+import {
+  Cascade,
+  Collection,
+  Entity,
+  OneToMany,
+  Property,
+  ManyToOne,
+  Opt,
+} from '@mikro-orm/core';
 import { Book } from '.';
 import { BaseEntity } from './BaseEntity';
 
 @Entity()
 export class Author extends BaseEntity {
-
   @Property()
   name: string;
 
@@ -21,7 +27,7 @@ export class Author extends BaseEntity {
   @Property({ nullable: true })
   born?: Date;
 
-  @OneToMany(() => Book, b => b.author, { cascade: [Cascade.ALL] })
+  @OneToMany(() => Book, (b) => b.author, { cascade: [Cascade.ALL] })
   books = new Collection<Book>(this);
 
   @ManyToOne(() => Book, { nullable: true })
@@ -32,5 +38,4 @@ export class Author extends BaseEntity {
     this.name = name;
     this.email = email;
   }
-
 }

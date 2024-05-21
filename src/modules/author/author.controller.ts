@@ -1,15 +1,30 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
-import { EntityRepository, QueryOrder, wrap, EntityManager } from '@mikro-orm/mysql';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
+import {
+  EntityRepository,
+  QueryOrder,
+  wrap,
+  EntityManager,
+} from '@mikro-orm/postgresql';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Author } from '../../entities';
 
 @Controller('author')
 export class AuthorController {
-
   constructor(
-    @InjectRepository(Author) private readonly authorRepository: EntityRepository<Author>,
+    @InjectRepository(Author)
+    private readonly authorRepository: EntityRepository<Author>,
     private readonly em: EntityManager,
-  ) { }
+  ) {}
 
   @Get()
   async find() {
@@ -22,15 +37,21 @@ export class AuthorController {
 
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number) {
-    return await this.authorRepository.findOneOrFail(id, {
-      populate: ['books'],
-    });
+    return await this.authorRepository.findOneOrFail(
+      { id },
+      {
+        populate: ['books'],
+      },
+    );
   }
 
   @Post()
   async create(@Body() body: any) {
     if (!body.name || !body.email) {
-      throw new HttpException('One of `name, email` is missing', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'One of `name, email` is missing',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const author = this.authorRepository.create(body);
@@ -41,11 +62,10 @@ export class AuthorController {
 
   @Put(':id')
   async update(@Param('id', ParseIntPipe) id: number, @Body() body: any) {
-    const author = await this.authorRepository.findOneOrFail(id);
+    const author = await this.authorRepository.findOneOrFail({ id });
     wrap(author).assign(body);
     await this.em.flush();
 
     return author;
   }
-
 }

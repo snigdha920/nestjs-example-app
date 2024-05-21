@@ -1,16 +1,26 @@
-import { Body, Controller, Get, HttpException, HttpStatus, Param, ParseIntPipe, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { EntityRepository, QueryOrder, wrap } from '@mikro-orm/core';
 import { InjectRepository } from '@mikro-orm/nestjs';
 import { Book } from '../../entities';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/postgresql';
 
 @Controller('book')
 export class BookController {
-
   constructor(
-    @InjectRepository(Book) private readonly bookRepository: EntityRepository<Book>,
+    @InjectRepository(Book)
+    private readonly bookRepository: EntityRepository<Book>,
     private readonly em: EntityManager,
-  ) { }
+  ) {}
 
   @Get()
   async find() {
@@ -31,7 +41,10 @@ export class BookController {
   @Post()
   async create(@Body() body: any) {
     if (!body.title || !body.author) {
-      throw new HttpException('One of `title, author` is missing', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'One of `title, author` is missing',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const book = this.bookRepository.create(body);
@@ -53,5 +66,4 @@ export class BookController {
 
     return book;
   }
-
 }
