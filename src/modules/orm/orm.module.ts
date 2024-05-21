@@ -52,14 +52,12 @@ import path from 'path';
             snapshot: true, // save snapshot when creating new migrations
             emit: 'js', // migration generation mode
           },
-        };
-
-        return {
-          ...baseMikroConfig,
           highlighter: new SqlHighlighter(),
           host: databaseConfig.host,
           port: databaseConfig.port,
         };
+
+        return baseMikroConfig;
       },
     }),
     MikroOrmModule.forFeature({
